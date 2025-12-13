@@ -1,8 +1,5 @@
 package ru.yandex.practicum.tests;
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import org.junit.After;
 import org.junit.Test;
 import ru.yandex.practicum.factories.CourierFactory;
@@ -15,116 +12,101 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 public class LoginCourierTests {
 
     private final CourierFactory courierFactory = new CourierFactory();
+    private final CourierSteps courierSteps = new CourierSteps();
+    private final LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
+    private Courier createdCourier;
 
+    @After
+    public void tearDown() {
+        if (createdCourier != null && createdCourier.getLogin() != null && createdCourier.getPassword() != null) {
+            try {
+                Integer courierId = loginCourierSteps.loginCourier(createdCourier)
+                        .extract()
+                        .path("id");
 
-    @Test
-    public void shouldLoginCourier(){
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-        Courier fullFieldCourier = courierFactory.createFullFieldCourier();
-        CourierSteps courierSteps = new CourierSteps();
-        courierSteps.creatingFullFieldCourier(fullFieldCourier);
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
-        loginCourierSteps.loginCourier(fullFieldCourier)
-                .statusCode(200);
-
+                if (courierId != null) {
+                    Courier courierToDelete = new Courier();
+                    courierToDelete.setId(courierId);
+                    loginCourierSteps.deleteCourier(courierToDelete);
+                }
+            } catch (Exception e) {
+            }
+        }
+        createdCourier = null;
     }
 
     @Test
-    public void loginCourierWithRequiredField(){
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-        Courier requiredFieldCourier = courierFactory.createRequiredFieldCourier();
-        CourierSteps courierSteps = new CourierSteps();
-        courierSteps.creatingRequiredFieldCourier(requiredFieldCourier);
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
-        loginCourierSteps.loginCourier(requiredFieldCourier)
+    public void shouldLoginCourier() {
+        createdCourier = courierFactory.createFullFieldCourier();
+        courierSteps.creatingFullFieldCourier(createdCourier);
+        loginCourierSteps.loginCourier(createdCourier)
+                .statusCode(200);
+    }
+
+    @Test
+    public void loginCourierWithRequiredField() {
+        createdCourier = courierFactory.createRequiredFieldCourier();
+        courierSteps.creatingRequiredFieldCourier(createdCourier);
+        loginCourierSteps.loginCourier(createdCourier)
                 .statusCode(200);
     }
 
     @Test
     public void loginWithWrongLoginShouldReturnError() {
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+        createdCourier = courierFactory.createRequiredFieldCourier();
+        courierSteps.creatingFullFieldCourier(createdCourier);
 
-        Courier requiredFieldCourier = courierFactory.createRequiredFieldCourier();
-        CourierSteps courierSteps = new CourierSteps();
-        courierSteps.creatingFullFieldCourier(requiredFieldCourier);
+        Courier wrongLoginCourier = courierFactory.createWithWrongLoginCourier(createdCourier);
 
-        Courier wrongLoginCourier = courierFactory.createWithWrongLoginCourier(requiredFieldCourier);
-
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
         loginCourierSteps.loginCourier(wrongLoginCourier)
                 .statusCode(404);
-
     }
 
     @Test
-    public void loginWithWrongPasswordShouldReturnError(){
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
+    public void loginWithWrongPasswordShouldReturnError() {
+        createdCourier = courierFactory.createRequiredFieldCourier();
+        courierSteps.creatingFullFieldCourier(createdCourier);
 
-        Courier requiredFieldCourier = courierFactory.createRequiredFieldCourier();
-        CourierSteps courierSteps = new CourierSteps();
-        courierSteps.creatingFullFieldCourier(requiredFieldCourier);
+        Courier wrongPasswordCourier = courierFactory.createWithWrongPasswordCourier(createdCourier);
 
-        Courier wrongPasswordCourier = courierFactory.createWithWrongPasswordCourier(requiredFieldCourier);
-
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
         loginCourierSteps.loginCourier(wrongPasswordCourier)
                 .statusCode(404);
     }
 
     @Test
-    public void loginWithoutLoginShouldReturnError(){
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-        Courier requiredFieldCourier = courierFactory.createRequiredFieldCourier();
-        CourierSteps courierSteps = new CourierSteps();
-        courierSteps.creatingRequiredFieldCourier(requiredFieldCourier);
+    public void loginWithoutLoginShouldReturnError() {
+        createdCourier = courierFactory.createRequiredFieldCourier();
+        courierSteps.creatingRequiredFieldCourier(createdCourier);
 
-        Courier withoutLoginWithExistentPasswordCourier = courierFactory.createWithoutLoginWithExistentPasswordCourier(requiredFieldCourier);
+        Courier withoutLoginWithExistentPasswordCourier = courierFactory.createWithoutLoginWithExistentPasswordCourier(createdCourier);
 
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
         loginCourierSteps.loginCourier(withoutLoginWithExistentPasswordCourier)
                 .statusCode(400);
-
     }
 
     @Test
-    public void loginWithoutPasswordShouldReturnError(){
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-        Courier requiredFieldCourier = courierFactory.createRequiredFieldCourier();
-        CourierSteps courierSteps = new CourierSteps();
-        courierSteps.creatingRequiredFieldCourier(requiredFieldCourier);
+    public void loginWithoutPasswordShouldReturnError() {
+        createdCourier = courierFactory.createRequiredFieldCourier();
+        courierSteps.creatingRequiredFieldCourier(createdCourier);
 
-        Courier withoutPasswordWithExistentLoginCourier = courierFactory.createWithoutPasswordWithExistentLoginCourier(requiredFieldCourier);
+        Courier withoutPasswordWithExistentLoginCourier = courierFactory.createWithoutPasswordWithExistentLoginCourier(createdCourier);
 
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
         loginCourierSteps.loginCourier(withoutPasswordWithExistentLoginCourier)
                 .statusCode(400);
     }
 
     @Test
-    public void loginWithNonExistentCourierShouldReturnError(){
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-       Courier nonExistentCourier = courierFactory.createRequiredFieldCourier();
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
-
+    public void loginWithNonExistentCourierShouldReturnError() {
+        Courier nonExistentCourier = courierFactory.createRequiredFieldCourier();
         loginCourierSteps.loginCourier(nonExistentCourier)
                 .statusCode(404);
     }
 
     @Test
-    public void loginCourierShouldReturnCorrectBody(){
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-        Courier requiredFieldCourier = courierFactory.createRequiredFieldCourier();
-        CourierSteps courierSteps = new CourierSteps();
-        courierSteps.creatingRequiredFieldCourier(requiredFieldCourier);
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
-        loginCourierSteps.loginCourier(requiredFieldCourier)
+    public void loginCourierShouldReturnCorrectBody() {
+        createdCourier = courierFactory.createRequiredFieldCourier();
+        courierSteps.creatingRequiredFieldCourier(createdCourier);
+        loginCourierSteps.loginCourier(createdCourier)
                 .body("id", notNullValue());
-    }
-
-    @After
-    public void tearDown(){
-        LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
-        loginCourierSteps.deleteCourier(Courier)
-                .statusCode(200);
     }
 }
