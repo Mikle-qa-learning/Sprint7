@@ -17,26 +17,6 @@ public class CreateCourierTests {
 
     private Courier createdCourier;
 
-    @After
-    public void tearDown() {
-        if (createdCourier != null && createdCourier.getLogin() != null && createdCourier.getPassword() != null) {
-            try {
-                Integer courierId = loginCourierSteps.loginCourier(createdCourier)
-                        .extract()
-                        .path("id");
-
-                if (courierId != null) {
-                    Courier courierToDelete = new Courier();
-                    courierToDelete.setId(courierId);
-                    loginCourierSteps.deleteCourier(courierToDelete);
-                }
-            } catch (Exception e) {
-
-            }
-        }
-        createdCourier = null; // Сбрасываем ссылку
-    }
-
     @Test
     public void shouldCreateCourier() {
         createdCourier = courierFactory.createFullFieldCourier();
@@ -112,5 +92,25 @@ public class CreateCourierTests {
         Courier secondCourier = courierFactory.createWithExistingLoginCourier(createdCourier.getLogin());
         courierSteps.creatingFullFieldCourier(secondCourier)
                 .statusCode(409);
+    }
+
+    @After
+    public void tearDown() {
+        if (createdCourier != null && createdCourier.getLogin() != null && createdCourier.getPassword() != null) {
+            try {
+                Integer courierId = loginCourierSteps.loginCourier(createdCourier)
+                        .extract()
+                        .path("id");
+
+                if (courierId != null) {
+                    Courier courierToDelete = new Courier();
+                    courierToDelete.setId(courierId);
+                    loginCourierSteps.deleteCourier(courierToDelete);
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        createdCourier = null;
     }
 }

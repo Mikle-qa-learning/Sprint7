@@ -9,7 +9,6 @@ public class Courier {
     public Courier(){
     }
 
-    // Геттеры
     public String getLogin() {
         return login;
     }
@@ -30,7 +29,6 @@ public class Courier {
         return firstName;
     }
 
-    // Сеттеры
     public void setLogin(String login) {
         this.login = login;
     }
