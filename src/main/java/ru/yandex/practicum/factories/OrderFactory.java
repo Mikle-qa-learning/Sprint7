@@ -1,5 +1,6 @@
 package ru.yandex.practicum.factories;
 
+import io.qameta.allure.Step;
 import net.datafaker.Faker;
 import ru.yandex.practicum.models.Order;
 import java.util.List;
@@ -9,6 +10,7 @@ public class OrderFactory {
 
     private final Faker faker = new Faker();
 
+    @Step("Создание заказа с параметром color=BLACK")
     public Order createOrderWithColorBlack(){
         Order order = new Order();
         order.setFirstName(faker.name().firstName());
@@ -23,6 +25,7 @@ public class OrderFactory {
         return order;
     }
 
+    @Step("Создание заказа с параметром color=GREY")
     public Order createOrderWithColorGray() {
         Order order = new Order();
         order.setFirstName(faker.name().firstName());
@@ -37,6 +40,7 @@ public class OrderFactory {
         return order;
     }
 
+    @Step("Создание заказа с параметром color=BLACK,GREY")
     public Order createOrderWithBothColors() {
         Order order = new Order();
         order.setFirstName(faker.name().firstName());
@@ -51,6 +55,7 @@ public class OrderFactory {
         return order;
     }
 
+    @Step("Создание заказа без параметра color")
     public Order createOrderWithoutColors() {
         Order order = new Order();
         order.setFirstName(faker.name().firstName());

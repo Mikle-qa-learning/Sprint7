@@ -8,6 +8,7 @@ import static io.restassured.RestAssured.given;
 
 public class CourierSteps {
 
+
     public ValidatableResponse creatingFullFieldCourier(Courier courier){
         return given()
                 .baseUri("https://qa-scooter.praktikum-services.ru/")
@@ -20,6 +21,7 @@ public class CourierSteps {
 
     }
 
+
     public ValidatableResponse creatingRequiredFieldCourier(Courier courier){
         return given()
                 .baseUri("https://qa-scooter.praktikum-services.ru/")
@@ -31,6 +33,7 @@ public class CourierSteps {
 
     }
 
+
     public ValidatableResponse creatingWithoutLoginCourier(Courier courier){
         return given()
                 .baseUri("https://qa-scooter.praktikum-services.ru/")
@@ -40,6 +43,7 @@ public class CourierSteps {
                 .post("/api/v1/courier")
                 .then();
     }
+
 
     public ValidatableResponse creatingWithoutPasswordCourier(Courier courier){
         return given()
@@ -51,6 +55,7 @@ public class CourierSteps {
                 .then();
     }
 
+
     public ValidatableResponse creatingWithEmptyLoginCourier(Courier courier){
         return given()
                 .baseUri("https://qa-scooter.praktikum-services.ru/")
@@ -60,6 +65,7 @@ public class CourierSteps {
                 .post("/api/v1/courier")
                 .then();
     }
+
 
     public ValidatableResponse creatingWithEmptyPasswordCourier(Courier courier){
         return given()

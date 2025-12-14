@@ -1,5 +1,6 @@
 package ru.yandex.practicum.steps;
 
+import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import ru.yandex.practicum.models.Order;
@@ -18,6 +19,7 @@ public class OrderSteps {
                 .then();
     }
 
+    @Step("Удаление заказа")
     public ValidatableResponse cancelOrder(Integer trackId) {
         return given()
                 .baseUri("https://qa-scooter.praktikum-services.ru/")
