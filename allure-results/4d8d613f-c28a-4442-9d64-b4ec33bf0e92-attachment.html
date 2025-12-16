@@ -1,0 +1,29 @@
+<div>POST to http://qa-scooter.praktikum-services.ru/api/v1/courier/login</div>
+
+<h4>Body</h4>
+<div>
+    <pre class="preformated-text">
+    {
+    &quot;login&quot;: &quot;non_existent_ad30ec54-d1ed-4cd8-bca9-517bbb2e99ab&quot;,
+    &quot;password&quot;: &quot;non_existent_7cf876da-fa4d-4f80-bb31-0f9ef133c708&quot;,
+    &quot;firstName&quot;: null
+}
+    </pre>
+</div>
+
+<h4>Headers</h4>
+<div>
+        <div>Accept: */*</div>
+        <div>Content-Type: application/json</div>
+</div>
+
+
+
+<h4>Curl</h4>
+<div>
+curl -v -X POST &#39;http://qa-scooter.praktikum-services.ru/api/v1/courier/login&#39; -H &#39;Accept: */*&#39; -H &#39;Content-Type: application/json&#39; -d &#39;{
+    &quot;login&quot;: &quot;non_existent_ad30ec54-d1ed-4cd8-bca9-517bbb2e99ab&quot;,
+    &quot;password&quot;: &quot;non_existent_7cf876da-fa4d-4f80-bb31-0f9ef133c708&quot;,
+    &quot;firstName&quot;: null
+}&#39;
+</div>
