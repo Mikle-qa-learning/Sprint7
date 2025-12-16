@@ -6,25 +6,19 @@ public class Order {
     private String firstName;
     private String lastName;
     private String address;
-    private Integer metroStation;
     private String phone;
-    private Integer rentTime;
+    private String rentTime;
     private String deliveryDate;
     private String comment;
     private List<String> color;
-    private Integer track; // Добавлено новое поле
 
-    // Конструкторы
     public Order() {
     }
 
-    public Order(String firstName, String lastName, String address,
-                 Integer metroStation, String phone, Integer rentTime,
-                 String deliveryDate, String comment, List<String> color) {
+    public Order(String firstName, String lastName, String address, String phone, String rentTime, String deliveryDate, String comment, List<String> color) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
-        this.metroStation = metroStation;
         this.phone = phone;
         this.rentTime = rentTime;
         this.deliveryDate = deliveryDate;
@@ -32,39 +26,67 @@ public class Order {
         this.color = color;
     }
 
-    // Геттеры и сеттеры
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public String getFirstName() {
+        return firstName;
+    }
 
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public String getLastName() {
+        return lastName;
+    }
 
-    public Integer getMetroStation() { return metroStation; }
-    public void setMetroStation(Integer metroStation) { this.metroStation = metroStation; }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getAddress() {
+        return address;
+    }
 
-    public Integer getRentTime() { return rentTime; }
-    public void setRentTime(Integer rentTime) { this.rentTime = rentTime; }
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-    public String getDeliveryDate() { return deliveryDate; }
-    public void setDeliveryDate(String deliveryDate) { this.deliveryDate = deliveryDate; }
+    public String getPhone() {
+        return phone;
+    }
 
-    public String getComment() { return comment; }
-    public void setComment(String comment) { this.comment = comment; }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-    public List<String> getColor() { return color; }
-    public void setColor(List<String> color) { this.color = color; }
+    public String getRentTime() {
+        return rentTime;
+    }
 
-    public Integer getTrack() { return track; } // Добавлен геттер
-    public void setTrack(Integer track) { this.track = track; } // Добавлен сеттер
+    public void setRentTime(String rentTime) {
+        this.rentTime = rentTime;
+    }
+
+    public String getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    public void setDeliveryDate(String deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public List<String> getColor() {
+        return color;
+    }
+
+    public void setColor(List<String> color) {
+        this.color = color;
+    }
 }
-
-
-
-
-

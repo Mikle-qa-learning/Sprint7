@@ -1,127 +1,115 @@
 package ru.yandex.practicum.tests;
 
+import io.qameta.allure.*;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.response.Response;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import ru.yandex.practicum.factories.CourierFactory;
-import ru.yandex.practicum.models.Courier;
-import ru.yandex.practicum.steps.CourierSteps;
-import ru.yandex.practicum.steps.LoginCourierSteps;
+import ru.yandex.practicum.tests.steps.CourierSteps;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
+import java.util.UUID;
 
-public class LoginCourierTests {
+public class LoginCourierTests extends CourierSteps {
+    private String login;
+    private String password;
+    private String firstName;
 
-    private final CourierFactory courierFactory = new CourierFactory();
-    private final CourierSteps courierSteps = new CourierSteps();
-    private final LoginCourierSteps loginCourierSteps = new LoginCourierSteps();
-    private Courier createdCourier;
+    @Before
+    @Step("Подготовка данных для тестирования")
+    public void prepareTestData() {
+        this.login = "courier_" + UUID.randomUUID();
+        this.password = "pass_" + UUID.randomUUID();
+        this.firstName = "name_" + UUID.randomUUID();
 
+        Response createResponse = createCourier(login, password, firstName);
 
-
-    @Test
-    @DisplayName("Тест: успешный логин курьера с параметрами логин, пароль, имя")
-    public void shouldLoginCourier() {
-        RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
-        createdCourier = courierFactory.createFullFieldCourier();
-        courierSteps.creatingFullFieldCourier(createdCourier);
-        loginCourierSteps.loginCourier(createdCourier)
-                .statusCode(200);
-    }
-
-    @Test
-    @DisplayName("Тест: успешный логин курьера с обязательными параметрами логин, пароль")
-    public void loginCourierWithRequiredField() {
-        createdCourier = courierFactory.createRequiredFieldCourier();
-        courierSteps.creatingRequiredFieldCourier(createdCourier);
-        loginCourierSteps.loginCourier(createdCourier)
-                .statusCode(200);
-    }
-
-    @Test
-    @DisplayName("Тест: ошибка при попытке логина курьера с неверным логином")
-    public void loginWithWrongLoginShouldReturnError() {
-        createdCourier = courierFactory.createRequiredFieldCourier();
-        courierSteps.creatingFullFieldCourier(createdCourier);
-
-        Courier wrongLoginCourier = courierFactory.createWithWrongLoginCourier(createdCourier);
-
-        loginCourierSteps.loginCourier(wrongLoginCourier)
-                .statusCode(404);
-    }
-
-    @Test
-    @DisplayName("Тест: ошибка при попытке логина курьера с неверным паролем")
-    public void loginWithWrongPasswordShouldReturnError() {
-        createdCourier = courierFactory.createRequiredFieldCourier();
-        courierSteps.creatingFullFieldCourier(createdCourier);
-
-        Courier wrongPasswordCourier = courierFactory.createWithWrongPasswordCourier(createdCourier);
-
-        loginCourierSteps.loginCourier(wrongPasswordCourier)
-                .statusCode(404);
-    }
-
-    @Test
-    @DisplayName("Тест: ошибка при попытке логина курьера без логина")
-    public void loginWithoutLoginShouldReturnError() {
-        createdCourier = courierFactory.createRequiredFieldCourier();
-        courierSteps.creatingRequiredFieldCourier(createdCourier);
-
-        Courier withoutLoginWithExistentPasswordCourier = courierFactory.createWithoutLoginWithExistentPasswordCourier(createdCourier);
-
-        loginCourierSteps.loginCourier(withoutLoginWithExistentPasswordCourier)
-                .statusCode(400);
-    }
-
-    @Test
-    @DisplayName("Тест: ошибка при попытке логина курьера без пароля")
-    public void loginWithoutPasswordShouldReturnError() {
-        createdCourier = courierFactory.createRequiredFieldCourier();
-        courierSteps.creatingRequiredFieldCourier(createdCourier);
-
-        Courier withoutPasswordWithExistentLoginCourier = courierFactory.createWithoutPasswordWithExistentLoginCourier(createdCourier);
-
-        loginCourierSteps.loginCourier(withoutPasswordWithExistentLoginCourier)
-                .statusCode(400);
-    }
-
-    @Test
-    @DisplayName("Тест: ошибка при попытке логина несуществующего курьера")
-    public void loginWithNonExistentCourierShouldReturnError() {
-        Courier nonExistentCourier = courierFactory.createRequiredFieldCourier();
-        loginCourierSteps.loginCourier(nonExistentCourier)
-                .statusCode(404);
-    }
-
-    @Test
-    @DisplayName("Тест: при успешном логине ответ возвращает корректное тело")
-    public void loginCourierShouldReturnCorrectBody() {
-        createdCourier = courierFactory.createRequiredFieldCourier();
-        courierSteps.creatingRequiredFieldCourier(createdCourier);
-        loginCourierSteps.loginCourier(createdCourier)
-                .body("id", notNullValue());
+        if (!verifyCreationSuccess(createResponse, 201)) {
+            throw new RuntimeException("Не удалось создать курьера для тестирования логина");
+        }
     }
 
     @After
-    public void tearDown() {
-        if (createdCourier != null && createdCourier.getLogin() != null && createdCourier.getPassword() != null) {
-            try {
-                Integer courierId = loginCourierSteps.loginCourier(createdCourier)
-                        .extract()
-                        .path("id");
+    @Step("Очистка данных после теста")
+    public void clearAfterTests() {
+        Response loginResponse = loginCourier(login, password);
 
-                if (courierId != null) {
-                    Courier courierToDelete = new Courier();
-                    courierToDelete.setId(courierId);
-                    loginCourierSteps.deleteCourier(courierToDelete);
-                }
-            } catch (Exception e) {
-            }
+        if (loginResponse.getStatusCode() != 200) {
+            return;
         }
-        createdCourier = null;
+
+        Integer idCourier = getIdCourier(loginResponse);
+        if (idCourier == null) {
+            return;
+        }
+
+        deleteCourier(idCourier);
+    }
+
+
+    @Test
+    @DisplayName("Логин курьера ")
+    public void loginCourierIsSuccess() {
+        Response response = loginCourier(login, password);
+
+        verifyStatusCode(response, 200);
+        verifyCourierIdNotNull(response);
+    }
+
+    @Test
+    @DisplayName("Логин курьера с пустыми параметрами")
+    public void loginCourierMissingAllParamsIsFailed() {
+        Response response = loginCourier("", "");
+
+        verifyStatusCode(response, 400);
+        verifyResponseMessage(response, "message", "Недостаточно данных для входа");
+    }
+
+    @Test
+    @DisplayName("Логин курьера без логина")
+    public void loginCourierMissingLoginParamIsFailed() {
+        Response response = loginCourier("", password);
+
+        verifyStatusCode(response, 400);
+        verifyResponseMessage(response, "message", "Недостаточно данных для входа");
+    }
+
+    @Test
+    @DisplayName("Логин курьера без пароля")
+    public void loginCourierMissingPasswordParamIsFailed() {
+        Response response = loginCourier(login, "");
+
+        verifyStatusCode(response, 400);
+        verifyResponseMessage(response, "message", "Недостаточно данных для входа");
+    }
+
+    @Test
+    @DisplayName("Логин курьера с некорректным логином")
+    public void loginCourierIncorrectLoginParamIsFailed() {
+        Response response = loginCourier(login + "1", password);
+
+        verifyStatusCode(response, 404);
+        verifyResponseMessage(response, "message", "Учетная запись не найдена");
+    }
+
+    @Test
+    @DisplayName("Логин курьера с некорректным паролем")
+    public void loginCourierIncorrectPasswordParamIsFailed() {
+        Response response = loginCourier(login, password + "1");
+
+        verifyStatusCode(response, 404);
+        verifyResponseMessage(response, "message", "Учетная запись не найдена");
+    }
+
+    @Test
+    @DisplayName("Логин несуществующего курьера")
+    public void loginNonExistentCourierIsFailed() {
+        String nonExistentLogin = "non_existent_" + UUID.randomUUID();
+        String nonExistentPassword = "non_existent_" + UUID.randomUUID();
+
+        Response response = loginCourier(nonExistentLogin, nonExistentPassword);
+
+        verifyStatusCode(response, 404);
+        verifyResponseMessage(response, "message", "Учетная запись не найдена");
     }
 }
